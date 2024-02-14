@@ -1,15 +1,15 @@
-##API client application
+## API client application
 
-##Table of contents
+## Table of contents
 * Technologies
 * Setup
 * Sources
 
-##Technologies 
+## Technologies 
 Project is created with:
 * Python 3.11
 
-##Setup
+## Setup
 To run this project, install localy following Python modules:
 * requests
 
@@ -19,7 +19,7 @@ $ pip install requests
 The program send request to API and get response. In next step
 saves data from response in a CSV file.
 
-##Sources
+## Sources
 API is available at: (https://danepubliczne.imgw.pl/api/data/synop)
 
 IMGW annoucment: "Korzystanie z Serwisu oznacza zgodę Użytkownika na 
