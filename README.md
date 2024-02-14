@@ -13,9 +13,10 @@ Project is created with:
 To run this project, install localy following Python modules:
 * requests
 
-'''
+```
 $ pip install requests
-'''
+```
+
 The program send request to API and get response. In next step
 saves data from response in a CSV file.
 
