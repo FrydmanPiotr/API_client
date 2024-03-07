@@ -1,9 +1,15 @@
 ## API client application
 
 ## Table of contents
+* Description
 * Technologies
 * Setup
 * Sources
+
+## Description 
+The program sends a request to the API and receives a response. 
+In the next step saves the data from the response to a CSV file 
+and creates visualization in the browser and saves it as an HTML file. 
 
 ## Technologies 
 Project is created with:
@@ -16,9 +22,6 @@ To run this project, install localy following Python modules:
 ```
 $ pip install requests
 ```
-
-The program send request to API and get response. In next step
-saves data from response in a CSV file.
 
 ## Sources
 API is available at: https://danepubliczne.imgw.pl/api/data/synop
