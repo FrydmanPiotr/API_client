@@ -10,24 +10,23 @@ import time
 from plotly.graph_objs import Bar
 from plotly import offline
 
-# make an API call and process the response
+#make an API call and process the response
 url = 'https://danepubliczne.imgw.pl/api/data/synop'
+current_date = time.strftime("%d_%m_%Y", time.localtime())
+table_name = f"imgw_{current_date}"
+filename = f"imgw_{current_date}.csv"
+db_name = "imgw.sqlite"
+
 try:
     response = requests.get(url)
     if response.status_code != requests.codes.ok:
         print("Error")
     response_dict = response.json()
     
-    # Create a table name without special characters
-    current_date = time.strftime("%d_%m_%Y", time.localtime())
-    table_name = f"IMGW_{current_date}"
-    filename = f"imgw_{current_date}.csv"
-    db_name = "imgw.sqlite"
-
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
 
-    # creating table
+    #creating table
     c.execute(f'''CREATE TABLE IF NOT EXISTS {table_name}
             (stacja TEXT,
             temperatura FLOAT,
@@ -37,6 +36,7 @@ try:
 
     c.execute(f"delete from {table_name}")
 
+    #inserting data
     for station in response_dict:
         stacja = station['stacja']
         temperatura = station['temperatura']
@@ -53,10 +53,12 @@ try:
 
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
+
+    #show tables
     for db in c.execute("SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';"):
         print(db)
 
-    #saving data from response to file
+    #saving data from response to csv file
     with open(filename, 'w',newline="") as file:
         csvwriter=csv.writer(file, delimiter=";")
         headers=['Lokalizacja','Temperatura','Ciśnienie','Wiatr','Opady']
@@ -69,11 +71,11 @@ try:
             csvwriter.writerow(data)
     file.close()
 
-    querry = c.execute(f'SELECT stacja, temperatura FROM {table_name} order by temperatura asc')
+    querry = f'SELECT stacja, temperatura FROM {table_name} order by temperatura asc'
 
     station, parameter = [], []
 
-    for stacja,temperatura in querry:
+    for stacja,temperatura in c.execute(querry):
         station.append(stacja)
         parameter.append(temperatura)
 
