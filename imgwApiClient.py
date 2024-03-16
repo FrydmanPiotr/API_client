@@ -1,40 +1,52 @@
 """
-Project title: IGMW API client application
+Project title: API client application
 Author: Piotr Frydman
 """
+
 import requests
 import json
 import csv
-import sqlite3
+import sqlite3 as db
 import time
 from plotly.graph_objs import Bar
 from plotly import offline
 
-#make an API call and process the response
-url = 'https://danepubliczne.imgw.pl/api/data/synop'
 current_date = time.strftime("%d_%m_%Y", time.localtime())
 table_name = f"imgw_{current_date}"
-filename = f"imgw_{current_date}.csv"
-db_name = "imgw.sqlite"
+filename = table_name + ".csv"
 
-try:
-    response = requests.get(url)
-    if response.status_code != requests.codes.ok:
-        print("Error")
-    response_dict = response.json()
-    
-    conn = sqlite3.connect(db_name)
+def api_request():
+    #make an API call and process the response
+    url = 'https://danepubliczne.imgw.pl/api/data/synop'
+    try:
+        response = requests.get(url)
+        response_dict = response.json()
+        save_data_in_db(response_dict)
+    except Exception as e:
+        print("Error:", e)
+
+def connect_db():
+    db_name = "imgw.sqlite"
+    conn = db.connect(db_name)
+    return conn
+
+def save_data_in_db(response_dict):
+    #connect to database
+    conn = connect_db()
     c = conn.cursor()
 
     #creating table
-    c.execute(f'''CREATE TABLE IF NOT EXISTS {table_name}
+    querry = f'''CREATE TABLE IF NOT EXISTS {table_name}
             (stacja TEXT,
             temperatura FLOAT,
             ciśnienie INTEGER,
             wiatr INTEGER,
-            opady INTEGER)''')
+            opady INTEGER)'''
+    c.execute(querry)
 
-    c.execute(f"delete from {table_name}")
+    #clear existing data 
+    querry = f"DELETE FROM {table_name}"
+    c.execute(querry)
 
     #inserting data
     for station in response_dict:
@@ -44,70 +56,78 @@ try:
         wiatr = station['predkosc_wiatru']
         opady = station['suma_opadu']
 
-        c.execute(f"INSERT INTO {table_name} (stacja, temperatura, ciśnienie,wiatr,opady) VALUES (?, ?, ?,?,?)",
-                  (stacja, temperatura, cisnienie,wiatr,opady))
-          
-    #saving changes and close connection
+        querry = f'''INSERT INTO {table_name} (stacja, temperatura, ciśnienie, wiatr, opady)
+            VALUES (?, ?, ?, ?, ?)'''
+        c.execute(querry, (stacja, temperatura, cisnienie, wiatr, opady))
+
     conn.commit()
     conn.close()
 
-    conn = sqlite3.connect(db_name)
+def save_data_in_csv():
+    #connect to database
+    conn = connect_db()
     c = conn.cursor()
 
-    #show tables
-    for db in c.execute("SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';"):
-        print(db)
-
-    #saving data from response to csv file
-    with open(filename, 'w',newline="") as file:
-        csvwriter=csv.writer(file, delimiter=";")
-        headers=['Lokalizacja','Temperatura','Ciśnienie','Wiatr','Opady']
+    #saving data from database to CSV file
+    with open(filename, 'w', newline="") as file:
+        csvwriter = csv.writer(file, delimiter=";")
+        headers = ['Lokalizacja', 'Temperatura', 'Ciśnienie', 'Wiatr', 'Opady']
         csvwriter.writerow(headers)
 
-        #display columns names
-        querry = c.execute(f'SELECT * FROM {table_name}')
-        for data in querry:
-            print(data)
-            csvwriter.writerow(data)
-    file.close()
+        #writing data from database to CSV
+        querry = f'SELECT * FROM {table_name}'
+        c.execute(querry)
+        for row in c.fetchall():
+            row = [str(val).replace('.', ',') if isinstance(val, float) else val for val in row]
+            csvwriter.writerow(row)
+    conn.close()
 
-    querry = f'SELECT stacja, temperatura FROM {table_name} order by temperatura asc'
+def create_visualisation():
+    #connect to database
+    conn = connect_db()
+    c = conn.cursor()
 
+    #fetching data from the database
+    querry = f'SELECT stacja, temperatura FROM {table_name} ORDER BY temperatura ASC'
     station, parameter = [], []
 
-    for stacja,temperatura in c.execute(querry):
+    c.execute(querry)
+    for stacja, temperatura in c.fetchall():
         station.append(stacja)
         parameter.append(temperatura)
 
-    #creating visualisation
+    #creating visualization
     data = [{
-        'type':'bar',
+        'type': 'bar',
         'x': station,
         'y': parameter,
-        'marker':{
-            'color':'rgb(180,20,20)',
-            'line':{'width':1.5,'color': 'rgb(50,25,25)'}
-            },
-        'opacity':0.6,
-        }]
-    layout={
+        'marker': {
+            'color': 'rgb(180,20,20)',
+            'line': {'width': 1.5, 'color': 'rgb(50,25,25)'}
+        },
+        'opacity': 0.6,
+    }]
+    layout = {
         'title': f'Temperatura we wszystkich stacjach IMGW ({current_date})',
-        'titlefont': {'size':28},
+        'titlefont': {'size': 28},
         'xaxis': {
-            'title':'Temperatura (*C)',
-            'titlefont':{'size':24},
-            'tickfont':{'size':14},
-            },
+            'title': 'Temperatura (*C)',
+            'titlefont': {'size': 24},
+            'tickfont': {'size': 14},
+        },
         'yaxis': {
             'title': 'Lokalizacja stacji',
-            'titlefont':{'size':24},
-            'tickfont':{'size':14},
-            },
-        }
-    fig={'data':data,'layout': layout}
+            'titlefont': {'size': 24},
+            'tickfont': {'size': 14},
+        },
+    }
+    fig = {'data': data, 'layout': layout}
     offline.plot(fig, filename='temperature_imgw.html')
-       
-    c.close()
+    conn.close()
 
-except:
-    print("Error: Failed to connect with IMGW API")
+try:
+    api_request()
+    save_data_in_csv()
+    create_visualisation()
+except Exception as e:
+    print("Error:", e)
