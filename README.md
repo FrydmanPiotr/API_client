@@ -8,8 +8,7 @@
 
 ## Description 
 The program sends a request to the API and receives a response. 
-In the next step saves the data from the response to a CSV file 
-and creates visualization in the browser and saves it as an HTML file. 
+User can export the data from the database to a CSV file. 
 
 ## Technologies 
 Project is created with:
