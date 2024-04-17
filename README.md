@@ -7,8 +7,9 @@
 * Sources
 
 ## Description 
-The program sends a request to the API and receives a response. 
-User can export the data from the database to a CSV file. 
+User can fetch data from API, search tables
+in database by dates or export 
+data from table to a CSV file. 
 
 ## Technologies 
 Project is created with:
