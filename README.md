@@ -9,7 +9,9 @@
 ## Description 
 Load - connection to the IMWM API, receiving data 
 and saving it in the database
+
 Search - displaying data based on date
+
 Export - exporting data to a CSV file
 
 ![ImgwAPiClient GUI](https://github.com/FrydmanPiotr/ImgwApiClient/blob/main/images/imgw_api_client.png)
