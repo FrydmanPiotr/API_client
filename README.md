@@ -7,9 +7,12 @@
 * Sources
 
 ## Description 
-The program sends a request to the API and receives a response. 
-In the next step saves the data from the response to a CSV file 
-and creates visualization in the browser and saves it as an HTML file. 
+Load - connection to the IMWM API, receiving data 
+and saving it in the database
+Search - displaying data based on date
+Export - exporting data to a CSV file
+
+![ImgwAPiClient GUI](https://github.com/FrydmanPiotr/ImgwApiClient/blob/main/images/imgw_api_client.png)
 
 ## Technologies 
 Project is created with:
