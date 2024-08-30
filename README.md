@@ -32,9 +32,9 @@ command in system terminal:
 $ pip install requests
 ```
 
-__Important: requires prior installation of PIP 
+*Important: requires prior installation of PIP 
 (Python package manager). You can do this by
-running these commands in the terminal:__
+running these commands in the terminal:*
 
 ```
 $ curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
@@ -44,7 +44,7 @@ $ python get-pip.py
 ## Sources
 API is available at: [IMGW API](https://danepubliczne.imgw.pl/api/data/synop)
 
-__IMGW announcement: "Using the Service means that the User agrees to
+*IMGW announcement: "Using the Service means that the User agrees to
 comply with the provisions of the Regulations, therefore each User is
 obliged to read the Regulations before starting to
-use the Service"__ [Regulations](https://danepubliczne.imgw.pl/regulations)
+use the Service"* [Regulations](https://danepubliczne.imgw.pl/regulations)
