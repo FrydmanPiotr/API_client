@@ -42,7 +42,7 @@ $ python get-pip.py
 ```
 
 ## Sources
-API is available at: [IMGW API](https://danepubliczne.imgw.pl/api/data/synop)
+Data from API is available at: [IMGW API](https://danepubliczne.imgw.pl/api/data/synop)
 
 *IMGW announcement: "Using the Service means that the User agrees to
 comply with the provisions of the Regulations, therefore each User is
